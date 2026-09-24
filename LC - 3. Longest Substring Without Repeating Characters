@@ -1,0 +1,74 @@
+// this question is done on 24 september 2026.
+
+problem - 
+Given a string s, find the length of the longest substring without duplicate characters.
+
+Example 1:
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3. Note that "bca" and "cab" are also correct answers.
+
+Example 2:
+Input: s = "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+
+Example 3:
+Input: s = "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3.
+Notice that the answer must be a substring, "pwke" is a subsequence and not a substring.
+ 
+Constraints:
+0 <= s.length <= 105
+s consists of English letters, digits, symbols and spaces.
+
+solution - 
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+
+        // done by me and TC and SC = O(n).
+
+        unordered_map<char,int> freq;
+        int left = 0;
+        int maxAns = 0;
+
+        for(int right = 0; right < s.size(); right++){
+            freq[s[right]]++;
+
+            while(freq[s[right]] != 1){
+                freq[s[left]]--;
+
+                if(freq[s[left]] == 0){
+                    freq.erase(s[left]);
+                }
+
+                left++;
+            }
+            maxAns = max(maxAns,right-left+1);
+        }
+
+        // more optimal by chatGPT :
+        // approach - Instead of storing frequency, store the last index where a character appeared. it has similar tc and sc as above of O(n); but her it little more optimised averagely.
+
+        // unordered_map<char,int> lastSeen;
+
+        // int left = 0;
+        // int maxAns = 0;
+
+        // for(int right = 0; right < s.size(); right++){
+        //     char ch = s[right];
+
+        //     if(lastSeen.count(ch) and lastSeen[ch] >= left){
+        //         left = lastSeen[ch] + 1;
+        //     }
+
+        //     lastSeen[ch] = right;
+
+        //     maxAns = max(maxAns, right - left + 1);
+        // }
+        return maxAns;
+    }
+};
