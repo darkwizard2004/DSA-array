@@ -1,0 +1,124 @@
+// this is done on 24 september 2026 and it has TC = O(n * number_of_distinct_characters) because map comparison checks entries. Since only lowercase English letters are possible, practically this is O(n).
+// SC = O(1) because there can be at most 26 lowercase characters.
+
+// this quetsion can be solved using normal static array and hashmaps. we use 2 in each approach:
+
+problem - 
+Given two strings s1 and s2, return true if s2 contains a permutation of s1, or false otherwise.
+
+In other words, return true if one of s1's permutations is the substring of s2.
+
+Example 1:
+Input: s1 = "ab", s2 = "eidbaooo"
+Output: true
+Explanation: s2 contains one permutation of s1 ("ba").
+
+Example 2:
+Input: s1 = "ab", s2 = "eidboaoo"
+Output: false
+
+Constraints:
+1 <= s1.length, s2.length <= 104
+s1 and s2 consist of lowercase English letters.
+
+solution:
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+
+        // my try :
+        // unordered_map<char,int> freq1;
+        // unordered_map<char,int> freq2;
+
+        // int left = 0;
+
+        // for(int i = 0; i<s1.size(); i++){
+        //     freq1[s1[i]]++;
+        // }
+
+        // for(int right = 0; right < s2.size(); right++){
+        //     freq2[s2[right]]++;
+
+        //     while(freq2.has(freq1[s2[right]]) and freq2[s2[right]] != freq1[s2[right]] ){
+        //         freq2[s2[left]]--;
+        //         left++;
+        //     }
+
+        //     if(freq2[s2[right]] == 0){
+        //         freq2.erase(s2[right]);
+        //     }
+        // }
+        // if(freq2.count() == freq1.count()){
+        //     return true;
+        // }
+        // else return false;
+
+        // optimised solution by chatGPT:
+        //1. usu=ing hash map:
+        
+        // unordered_map<char,int> freq1;
+        // unordered_map<char,int> freq2;
+
+        // for(char c:s1){
+        //     freq1[c]++;
+        // }
+
+        // int left = 0;
+
+        // for(int right = 0; right < s2.size(); right++){
+        //     freq2[s2[right]]++;
+
+        //     if(right - left + 1 >  s1.size()){
+        //         freq2[s2[left]]--;
+
+        //         if(freq2[s2[left]] == 0){
+        //             freq2.erase(s2[left]);
+        //         }
+
+        //         left++;
+        //     }
+
+        //     if(right - left + 1  == s1.size() and freq1 == freq2){
+        //         return true;
+        //     }
+        // }
+
+        // using arrays:
+        // TC = O(n) and SC = O(1);
+        
+        int freq1[26] = {0};
+        int freq2[26] = {0};
+
+        for(char c:s1){
+            freq1[c-'a']++;
+        }
+
+        int left = 0;
+
+        for(int right = 0; right < s2.size(); right++){
+            freq2[s2[right] - 'a']++;
+
+            if(right - left + 1 >  s1.size()){
+                freq2[s2[left] - 'a']--;
+                left++;
+            }
+
+            if(right - left + 1  == s1.size() ){
+                bool same = true;
+
+                for(int i = 0 ; i <26; i++){
+                    if(freq1[i] != freq2[i]){
+                        same = false;
+                        break;
+                    }
+                }
+                if(same){
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
+};
