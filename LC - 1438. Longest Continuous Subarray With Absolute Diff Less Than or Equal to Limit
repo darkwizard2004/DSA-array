@@ -1,0 +1,187 @@
+// this is done on 30 september 2026 and it provides a good level understanding of using different data structures in sliding window concept.
+// best one : deque > multiset = maxheap-minheap > brute force
+
+// we can use multiple ways to solve this problem: brute force, multisets, maxheap-minheap and double deques;
+
+problem - 
+Given an array of integers nums and an integer limit, return the size of the longest non-empty subarray such that the absolute difference between any two elements of this subarray is less than or equal to limit.
+
+Example 1:
+Input: nums = [8,2,4,7], limit = 4
+Output: 2 
+Explanation: All subarrays are: 
+[8] with maximum absolute diff |8-8| = 0 <= 4.
+[8,2] with maximum absolute diff |8-2| = 6 > 4. 
+[8,2,4] with maximum absolute diff |8-2| = 6 > 4.
+[8,2,4,7] with maximum absolute diff |8-2| = 6 > 4.
+[2] with maximum absolute diff |2-2| = 0 <= 4.
+[2,4] with maximum absolute diff |2-4| = 2 <= 4.
+[2,4,7] with maximum absolute diff |2-7| = 5 > 4.
+[4] with maximum absolute diff |4-4| = 0 <= 4.
+[4,7] with maximum absolute diff |4-7| = 3 <= 4.
+[7] with maximum absolute diff |7-7| = 0 <= 4. 
+Therefore, the size of the longest subarray is 2.
+
+Example 2:
+Input: nums = [10,1,2,4,7,2], limit = 5
+Output: 4 
+Explanation: The subarray [2,4,7,2] is the longest since the maximum absolute diff is |2-7| = 5 <= 5.
+
+Example 3:
+Input: nums = [4,2,2,2,4,4,2,2], limit = 0
+Output: 3
+
+Constraints:
+1 <= nums.length <= 105
+1 <= nums[i] <= 109
+0 <= limit <= 109
+
+solution:
+class Solution {
+public:
+    int longestSubarray(vector<int>& nums, int limit) {
+
+        // this is done on 30 september 2026 and it provides a good level understanding of using different data structures in sliding window concept.
+        // best one : deque > multiset = maxheap-minheap > brute force
+
+        // we can use multiple ways to solve this problem:
+
+        // 1. max heap and min heap: TC = O(nlogn) and SC = O(n);
+
+        // priority_queue<pair<int,int>> maxHeap;
+        // priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> minHeap;
+
+        // int left = 0;
+        // int ans = 0;
+
+        // for(int right = 0; right < nums.size(); right++){
+        //     maxHeap.push({nums[right],right});
+        //     minHeap.push({nums[right],right});
+
+        //     while(maxHeap.top().second < left){
+        //         maxHeap.pop();
+        //     }
+
+        //     while(minHeap.top().second < left){
+        //         minHeap.pop();
+        //     }
+
+        //     while(maxHeap.top().first - minHeap.top().first > limit){
+        //         left++;
+        //         while(!maxHeap.empty() &&
+        //             maxHeap.top().second < left)
+        //                 maxHeap.pop();
+
+        //         while(!minHeap.empty() &&
+        //             minHeap.top().second < left)
+        //                 minHeap.pop();
+        //     }
+        //     ans = max(ans,right-left+1);
+        // }
+        // return ans;
+
+        // 2, using multiselt: contains elements in sorted order:
+        // here also TC = O(nlong) and SC = O(n);
+
+        // multiset<int> st;
+        
+        // int left = 0;
+        // int ans = 0;
+
+        // for(int right = 0; right < nums.size(); right++){
+        //     st.insert(nums[right]);
+
+        //     while((*st.rbegin() - *st.begin()) > limit){
+        //         st.erase(st.find(nums[left]));
+        //         left++;
+        //     }
+        //     ans = max(ans,right-left+1);
+        // }
+        // return ans;
+
+        // 3. deque : TC = O(n) and SC = O(n) as it not include any sorting overhead like in heaps and multisets.
+
+        deque<int> maxDq;
+        deque<int> minDq;
+
+        int left = 0;
+        int ans = 0;
+
+        for(int right = 0; right < nums.size(); right++) {
+
+            // Maintain decreasing order
+            while(!maxDq.empty() &&
+                  nums[maxDq.back()] < nums[right]) {
+
+                maxDq.pop_back();
+            }
+            maxDq.push_back(right);
+
+            // Maintain increasing order
+            while(!minDq.empty() &&
+                  nums[minDq.back()] > nums[right]) {
+
+                minDq.pop_back();
+            }
+            minDq.push_back(right);
+
+            // Shrink invalid window
+            // 1LL converts the calculation to long long (64-bit) to prevent integer overflow.
+            while(1LL * nums[maxDq.front()] -
+                  nums[minDq.front()] > limit) {
+
+                if(maxDq.front() == left)
+                    maxDq.pop_front();
+
+                if(minDq.front() == left)
+                    minDq.pop_front();
+
+                left++;
+            }
+
+            ans = max(ans, right-left+1);
+        }
+
+        return ans;
+
+        // 4. it is the brute force method: TC = O(n^2) and SC = O(1);
+        
+        // int n = nums.size();
+        // int ans = 0;
+
+        // for(int i = 0; i < n; i++) {
+
+        //     int maxEle = INT_MIN;
+        //     int minEle = INT_MAX;
+
+        //     for(int j = i; j < n; j++) {
+
+        //         maxEle = max(maxEle, nums[j]);
+        //         minEle = min(minEle, nums[j]);
+
+        //         if(1LL * maxEle - minEle > limit)
+        //             break;
+
+        //         ans = max(ans, j-i+1);
+        //     }
+        // }
+
+        // return ans;
+
+        // my try but its not possible to solve it this simple and the logic is not complete here.
+
+        // int left = 0;
+        // int length = 0;
+        // int maxLength = 0;
+
+        // for(int right =0; right<nums.size();right++){
+
+        //     while(abs(nums[left]-nums[right]) > limit){
+        //         left++;
+        //     }
+
+        //     maxLength = max(maxLength,right-left+1);
+        // }
+        // return maxLength;
+    }
+};
