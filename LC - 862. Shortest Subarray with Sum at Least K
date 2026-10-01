@@ -1,0 +1,137 @@
+// i have solved this on 1st october 2026 and use chatGPT to solve this.
+// recommend - to revise one o=more time upgraded version of 209. Minimum Size Subarray Sum.
+// it includes negatives as well which creates question difficult such question can be solved by montonic data structures and prefix or cumulative sum.
+// best : deque > minHeap > brute
+
+problem - 
+Given an integer array nums and an integer k, return the length of the shortest non-empty subarray of nums with a sum of at least k. If there is no such subarray, return -1.
+
+A subarray is a contiguous part of an array.
+
+Example 1:
+Input: nums = [1], k = 1
+Output: 1
+
+Example 2:
+Input: nums = [1,2], k = 4
+Output: -1
+
+Example 3:
+Input: nums = [2,-1,2], k = 3
+Output: 3
+
+Constraints:
+1 <= nums.length <= 105
+-105 <= nums[i] <= 105
+1 <= k <= 109
+
+solution - 
+class Solution {
+public:
+    int shortestSubarray(vector<int>& nums, int k) {
+
+        // my try : fails due to unexpected behaviour of negative numbers.
+
+        // int left = 0;
+        // int sum = 0;
+        // int minAns = INT_MAX;
+
+        // for(int right = 0; right < nums.size(); right++){
+        //     sum += nums[right];
+        //     // maxSum += nums[right];
+
+        //     while(sum >= k){
+        //         minAns = min(minAns, right-left+1);
+        //         sum -= nums[left];
+        //         left++;
+        //     }
+        
+        // }
+        //  if(minAns == INT_MAX){
+        //     return -1;
+        // }
+        // return minAns;
+
+        // if(minAns != INT_MAX)return minAns;
+        // return -1;
+
+        // brute force method : TC = O(n^2) and SC = O(1);
+        // it will show tle:
+
+    //     int ans = INT_MAX;
+
+    //     for(int i = 0; i<nums.size(); i++){
+    //         long long sum = 0;
+    //         for(int j = i; j<nums.size(); j++){
+    //             sum += nums[j];
+
+    //             if(sum >= k){
+    //                 ans = min(ans,j-i+1);
+    //                 break;
+    // why break? -> For a fixed i, this is the first ending index where sum reaches k, so any later ending would only produce a longer subarray.
+    //             }
+    //         }
+    //     }
+    //     return ans == INT_MAX ? -1 : ans;
+
+        // 2. prefixSum/cumulativeSum and monotonic deque: best solution:
+        // TC = O(n) and SC = O(1);
+
+        // vector<long long> prefix(nums.size()+1,0);
+
+        // for(int i = 0; i<nums.size(); i++){
+        //     prefix[i+1] = prefix[i] + nums[i];
+        // }
+
+        // deque<int> dq;
+        // int ans = INT_MAX;
+
+        // for(int i = 0; i<=nums.size(); i++){
+        //     while(!dq.empty() and prefix[i] - prefix[dq.front()] >= k){
+        //         ans = min(ans,i-dq.front());
+        //         dq.pop_front();
+        //     }
+
+        //     while(!dq.empty() and prefix[i] <= prefix[dq.back()]){
+        //         dq.pop_back();
+        //     }
+
+        //     dq.push_back(i);
+        // }
+        // return ans == INT_MAX ? -1 : ans;
+
+        // 3. Prefix Sum + Min Heap TC = O(nlong) and SC = O(n);
+
+        priority_queue<
+            pair<long long,int>,
+            vector<pair<long long,int>>,
+            greater<pair<long long,int>>
+        > pq;
+
+        long long prefix = 0;
+        int ans = INT_MAX;
+
+        // prefix sum 0 at prefix index 0
+        pq.push({0, 0});
+
+        for(int i = 0; i < nums.size(); i++) {
+
+            prefix += nums[i];
+
+            int currentIndex = i + 1;
+
+            while(!pq.empty() &&
+                  prefix - pq.top().first >= k) {
+
+                ans = min(ans,
+                          currentIndex - pq.top().second);
+
+                pq.pop();
+            }
+
+            pq.push({prefix, currentIndex});
+        }
+
+        return ans == INT_MAX ? -1 : ans;
+    }
+};
