@@ -1,0 +1,154 @@
+// this is done on 1 october 2026, it requires strict revision as i have copied code from chatGPT, try to understand the concept later as well. only 1 optimised solution but we do : brute -> checking every possible strings -> more optimised (sliding window).
+
+problem - 
+ou are given a string s and an array of strings words. All the strings of words are of the same length.
+
+A concatenated string is a string that exactly contains all the strings of any permutation of words concatenated.
+
+For example, if words = ["ab","cd","ef"], then "abcdef", "abefcd", "cdabef", "cdefab", "efabcd", and "efcdab" are all concatenated strings. "acdbef" is not a concatenated string because it is not the concatenation of any permutation of words.
+Return an array of the starting indices of all the concatenated substrings in s. You can return the answer in any order.
+
+Example 1:
+Input: s = "barfoothefoobarman", words = ["foo","bar"]
+Output: [0,9]
+Explanation:
+The substring starting at 0 is "barfoo". It is the concatenation of ["bar","foo"] which is a permutation of words.
+The substring starting at 9 is "foobar". It is the concatenation of ["foo","bar"] which is a permutation of words.
+
+Example 2:
+Input: s = "wordgoodgoodgoodbestword", words = ["word","good","best","word"]
+Output: []
+Explanation:
+There is no concatenated substring.
+
+Example 3:
+Input: s = "barfoofoobarthefoobarman", words = ["bar","foo","the"]
+Output: [6,9,12]
+Explanation:
+The substring starting at 6 is "foobarthe". It is the concatenation of ["foo","bar","the"].
+The substring starting at 9 is "barthefoo". It is the concatenation of ["bar","the","foo"].
+The substring starting at 12 is "thefoobar". It is the concatenation of ["the","foo","bar"].
+
+Constraints:
+1 <= s.length <= 104
+1 <= words.length <= 5000
+1 <= words[i].length <= 30
+s and words[i] consist of lowercase English letters.
+
+solution - 
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        // done it completely using chatGPT:
+
+        // number of ways to solve this :
+        // 1. brute force method -> generate number of words possible(permutations).
+        // but number of permutation will be n!.
+        // hence, TC = O(n! * n * m + searching) and SC = O(m*n) n = wordlength;
+        // so we would even consider it.
+
+        // 2. check evry possible starting index: TC = O(n*m*l) where n = s.size(), m = no of words, l = wordLen; and SC O(m); it will show tle.
+
+        // vector<int> ans;
+
+        // int n = s.size();
+        // int wordLen = words[0].size();
+        // int wordCount = words.size();
+        // int totalLen = wordLen * wordCount;
+
+        // unordered_map<string, int> need;
+
+        // for(string word : words) {
+        //     need[word]++;
+        // }
+
+        // for(int i = 0; i + totalLen <= n; i++) {
+
+        //     unordered_map<string, int> seen;
+
+        //     int j = 0;
+
+        //     for(; j < wordCount; j++) {
+
+        //         int start = i + j * wordLen;
+
+        //         string word = s.substr(start, wordLen);
+
+        //         // word isn't required
+        //         if(need.find(word) == need.end())
+        //             break;
+
+        //         seen[word]++;
+
+        //         // too many occurrences
+        //         if(seen[word] > need[word])
+        //             break;
+        //     }
+
+        //     if(j == wordCount) {
+        //         ans.push_back(i);
+        //     }
+        // }
+
+        // return ans;
+
+        //3. most optimised solution using sliding window:
+        // Conceptually: TC = O(n) but C++ substr() copies wordLen characters, so strictly: TC = O(n × wordLen) and SC = O(number of distinct words);
+
+        vector<int> ans;
+
+        int n = s.size();
+        int wordLen = words[0].size();
+        int wordCount = words.size();
+
+        unordered_map<string,int> need;
+
+        for(string word : words){
+            need[word]++;
+        }
+
+        for(int offSet =0; offSet < wordLen; offSet++){
+            int left = offSet;
+            int count = 0;
+
+            unordered_map<string,int> window;
+
+            for(int right = offSet; right + wordLen <= n; right+=wordLen){
+                string word = s.substr(right,wordLen);
+
+                if(need.find(word) == need.end()){
+                    window.clear();
+                    count = 0;
+
+                    left = right+wordLen;
+                    continue;
+                }
+
+                window[word]++;
+                count++;
+
+                while(window[word] > need[word]){
+                    string leftWord = s.substr(left,wordLen);
+
+                    window[leftWord]--;
+                    count--;
+
+                    left += wordLen;
+                }
+
+                if(count == wordCount){
+                    ans.push_back(left);
+
+                    string leftWord = s.substr(left, wordLen);
+
+                    window[leftWord]--;
+                    count--;
+
+                    left += wordLen;
+                }
+
+            }
+        }
+        return ans;
+    }
+};
