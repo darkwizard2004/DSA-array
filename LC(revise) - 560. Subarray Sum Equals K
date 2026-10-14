@@ -1,0 +1,104 @@
+// this is done on 14 october 2026 and here we can use hashmap and prefix sum concept to calculate such answer.
+
+problem -
+Given an array of integers nums and an integer k, return the total number of subarrays whose sum equals to k.
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+Example 1:
+Input: nums = [1,1,1], k = 2
+Output: 2
+
+Example 2:
+Input: nums = [1,2,3], k = 3
+Output: 2
+
+Constraints:
+1 <= nums.length <= 2 * 104
+-1000 <= nums[i] <= 1000
+-107 <= k <= 107
+
+solution - 
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+
+        // optimised solution : hashamp + prefix sum(intution); TC=O(n) and SC=O(n).
+
+        // unordered_map<int,int> hm;
+
+        // int sum = 0;
+        // int count = 0;
+
+        // hm[0]++;
+
+        // for(int num:nums){
+        //     sum+= num;
+
+        //     count += hm[sum-k];
+
+        //     hm[sum]++;  
+        // }
+
+        // return count;
+
+        // using prefix sum array:
+
+        vector<int> prefix;
+        prefix.push_back(0);
+
+        for(int num:nums){
+            prefix.push_back(prefix.back()+num);
+        }
+
+        unordered_map<int,int> mp;
+        mp[0] = 1;
+        int count = 0;
+
+        for(int i = 1; i<prefix.size(); i++){
+
+            count += mp[prefix[i]-k];
+
+            mp[prefix[i]]++;
+        }
+        return count;
+
+        // brute force method: TC = O(n^2); shows tle
+        // int count = 0;
+
+        // for(int i = 0; i<nums.size(); i++){
+        //     int sum = 0;
+        //     for(int j = i; j<nums.size(); j++){
+        //         sum += nums[j];
+
+        //         if(sum == k){
+        //             count++;
+        //         }
+        //     }
+        // }
+        // return count;
+
+        // int count = 0;
+        // vector<int> prefix;
+        // prefix.push_back(0);
+        // for(int num:nums){
+        //     prefix.push_back(prefix.back() + num);
+        // }
+
+        // int left = 0;
+        // int right = 1;
+        // // int count = 0;
+        // for(int i = 0; i<prefix.size(); i++){
+        //     if(prefix[right] - prefix[left] < k){
+        //         right++;
+        //     }
+        //     if(prefix[right] - prefix[left] == k){
+        //         count++;
+        //         right++;
+        //     }
+        //     if(prefix[right] - prefix[left] > k){
+        //         left++;
+        //     }
+        // }
+        // return count;
+    }
+};
